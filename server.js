@@ -2,11 +2,20 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import {v2 as cloudinary} from "cloudinary";
 
 import authRoutes from "./routes/auth.routes.js";
+import userRoutes from "./routes/user.routes.js";
+import postRoutes from "./routes/post.routes.js";
 
 
 dotenv.config();
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLAUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+})
 
 const app = express();
 
@@ -27,5 +36,7 @@ app.get("/api/v1/health", (req, res) => {
 });
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/posts", postRoutes);
 
 app.listen(8080, () => console.log("Server is up and running"));

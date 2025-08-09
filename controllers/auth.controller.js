@@ -133,6 +133,7 @@ const login = async (req, res)=>{
     }
 }
 
+// LOGOUT
 const logout = async (req, res)=>{
     try {
         res.clearCookie("jwt", "",{maxAge: 0})
@@ -148,6 +149,7 @@ const logout = async (req, res)=>{
     }
 }
 
+// GET ME
 const getMe = async (req, res)=>{
     try {  
         const user = req.user; // user is attached by protectedRoute middleware
@@ -157,16 +159,10 @@ const getMe = async (req, res)=>{
                 error: "User not found."
             })
         }
-        // respond with user data
-        const data = {
-            _id: user._id,
-            userName: user.userName,
-            fullName: user.fullName,
-            email: user.email,
-            profileImg: user.profileImg,
-            coverImg: user.coverImg,
-            bio: user.bio,
-        }
+        
+        const data = await User.findById(user._id.toString())
+        .select("-password -__v") // exclude password and version key
+
         res.status(200).json({
             success: true,
             data  // exclude password from response
