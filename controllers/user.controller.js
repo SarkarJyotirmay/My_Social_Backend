@@ -115,13 +115,22 @@ const getSuggestedUsers = async (req, res) => {
       (user) => !usersFollowedByMe.following.includes(user._id)
     );
     // console.log("Filtered suggested users:", filteredUsers);
-    const suggestedUsers = filteredUsers.slice(0, 4);
+    // pagination logic
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit)*page || page*4;
+    const startIndex = 0; // as we want to show more users on clicking show more button
+    const endIndex = startIndex + limit;
+
+    // console.log("Pagination - Start Index:", startIndex, "End Index:", endIndex, "Limit:", limit, );
+ 
+    const suggestedUsers = filteredUsers.slice(startIndex, endIndex);
     suggestedUsers.forEach((user) => {
       user.password = null;
     });
 
     res.json({
-      suggestedUsers,
+      success: true,
+      users:suggestedUsers,
     });
   } catch (error) {
     console.error("Error fetching suggested users:", error);
