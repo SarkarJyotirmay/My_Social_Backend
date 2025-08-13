@@ -3,6 +3,11 @@ import User from "../models/user.model.js";
 import Notification from "../models/notification.model.js";
 
 import { v2 as cloudinary } from "cloudinary";
+import dayjs from "dayjs";
+
+import relativeTime from "dayjs/plugin/relativeTime.js";
+
+dayjs.extend(relativeTime);
 
 // Create a new post
 export const createPost = async (req, res) => {
@@ -21,17 +26,18 @@ export const createPost = async (req, res) => {
     }
 
     // If an image is provided, upload it to Cloudinary
+    let uploadedImg = null;
     if (img) {
       const uploadResponse = await cloudinary.uploader.upload(img, {
         folder: "posts",
       });
-      img = uploadResponse.secure_url;
+       uploadedImg = uploadResponse.secure_url;
     }
 
     const newPost = await Post.create({
       user: userId,
       text,
-      img,
+      img: uploadedImg || null,
       likes: [],
       comments: [],
     });
@@ -182,7 +188,13 @@ export const getAllPosts = async (req, res) => {
         path: "comments.user",
         select: "-password -__v",
       });
-    //
+    // format updated time
+    const postsWithFormatted = posts.map((post) => {
+      const obj = post.toObject(); // make plain JS object
+      obj.updatedAtFormatted = dayjs(post.updatedAt).fromNow();
+      return obj;
+    });
+
     if (posts.length === 0) {
       return res.json({
         success: true,
@@ -192,7 +204,7 @@ export const getAllPosts = async (req, res) => {
     }
     res.json({
       success: true,
-      posts: posts,
+      posts: postsWithFormatted,
     });
   } catch (error) {
     console.error("Error fetching posts:", error);
@@ -216,9 +228,15 @@ export const getLikedPosts = async (req, res) => {
       select: "-password -__v",
     });
 
+    const postsWithFormatted = likedPosts.map((post) => {
+      const obj = post.toObject(); // make plain JS object
+      obj.updatedAtFormatted = dayjs(post.updatedAt).fromNow();
+      return obj;
+    });
+
     res.json({
       success: true,
-      likedPosts,
+      posts: postsWithFormatted,
     });
   } catch (error) {
     console.error("Error fetching likes:", error);
@@ -246,20 +264,26 @@ export const getFollowedUserPosts = async (req, res) => {
       .populate({
         path: "comments.user",
         select: "-password -__v",
-      })
+      });
 
-      res.json({
-        success: true,
-        posts: feedPosts,
-      })
+      const postsWithFormatted = feedPosts.map((post) => {
+      const obj = post.toObject(); // make plain JS object
+      obj.updatedAtFormatted = dayjs(post.updatedAt).fromNow();
+      return obj;
+    });
+
+    res.json({
+      success: true,
+      posts: postsWithFormatted,
+    });
   } catch (error) {}
 };
 
 // Get posts of a specific user
-export const getUserPosts = async(req, res) => {
+export const getUserPosts = async (req, res) => {
   try {
     const { userName } = req.params;
-    const user = await User.findOne({ userName});
+    const user = await User.findOne({ userName });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -272,14 +296,21 @@ export const getUserPosts = async(req, res) => {
       .populate({
         path: "comments.user",
         select: "-password -__v",
-      })
+      });
 
-      res.json({
-        success: true,  
-        posts,
-      })
+      const postsWithFormatted = posts.map((post) => {
+      const obj = post.toObject(); // make plain JS object
+      obj.updatedAtFormatted = dayjs(post.updatedAt).fromNow();
+      return obj;
+    });
+
+
+    res.json({
+      success: true,
+      posts: postsWithFormatted,
+    });
   } catch (error) {
     console.error("Error fetching user posts:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
-}
+};
