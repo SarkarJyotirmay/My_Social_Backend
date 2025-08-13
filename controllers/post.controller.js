@@ -165,6 +165,7 @@ export const likeUnlikePost = async (req, res) => {
   }
 };
 
+// Get all posts
 export const getAllPosts = async (req, res) => {
   try {
     // Fetch all posts from the database
@@ -183,7 +184,11 @@ export const getAllPosts = async (req, res) => {
       });
     //
     if (posts.length === 0) {
-      return res.json([]);
+      return res.json({
+        success: true,
+        message: "No posts found",
+        posts: [],
+      });
     }
     res.json({
       success: true,
@@ -245,7 +250,7 @@ export const getFollowedUserPosts = async (req, res) => {
 
       res.json({
         success: true,
-        feedPosts,
+        posts: feedPosts,
       })
   } catch (error) {}
 };

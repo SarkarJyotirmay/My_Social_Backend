@@ -7,7 +7,7 @@ const router = express.Router()
 
 router.post("/create", protectedRoute, createPost)
 router.get("/allposts", protectedRoute, getAllPosts)
-router.get("/folloed-user-posts", protectedRoute, getFollowedUserPosts)
+router.get("/following", protectedRoute, getFollowedUserPosts)
 router.get("/user-posts/:userName", protectedRoute, getUserPosts)
 
 router.delete("/delete/:postId", protectedRoute, deletePost)

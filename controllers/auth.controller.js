@@ -137,7 +137,8 @@ const login = async (req, res)=>{
 const logout = async (req, res)=>{
     try {
         res.clearCookie("jwt", "",{maxAge: 0})
-        res.status(200).json({
+        res.json({
+            success: true,
             message: "Logged out successfully"
         })
     } catch (error) {
@@ -165,7 +166,7 @@ const getMe = async (req, res)=>{
 
         res.status(200).json({
             success: true,
-            data  // exclude password from response
+            user: data  // exclude password from response
         })       
     } catch (error) {
         console.log(`Error in getMe => ${error.message}`);

@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import {v2 as cloudinary} from "cloudinary";
 
 import authRoutes from "./routes/auth.routes.js";
@@ -27,6 +28,7 @@ mongoose
   .catch((e) => console.log(`Error in connecting DB => ${e}`));
 
 // Middlewares
+app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
