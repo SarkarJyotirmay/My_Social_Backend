@@ -133,7 +133,7 @@ export const likeUnlikePost = async (req, res) => {
     }
 
     if (post.likes.includes(userId)) {
-      // User already liked the post, so we will unlike it
+      // Unlike post
       post.likes = post.likes.filter(
         (like) => like.toString() !== userId.toString()
       );
@@ -145,7 +145,8 @@ export const likeUnlikePost = async (req, res) => {
       return res.json({
         success: true,
         message: "Post unliked successfully",
-        likes: post.likes.length,
+        likesCount: post.likes.length,
+        updatedLikes: post.likes,
       });
     } else {
       // User has not liked the post, so we will like it
@@ -162,7 +163,8 @@ export const likeUnlikePost = async (req, res) => {
       return res.json({
         success: true,
         message: "Post liked successfully",
-        likes: post.likes.length,
+        likesCount: post.likes.length,
+        updatedLikes: post.likes,
       });
     }
   } catch (error) {

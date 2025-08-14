@@ -5,6 +5,7 @@ import { v2 as cloudinary } from "cloudinary";
 // models
 import Notification from "../models/notification.model.js";
 
+
 const getUserProfile = async (req, res) => {
   try {
     const { userName } = req.params;
@@ -16,7 +17,10 @@ const getUserProfile = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.status(200).json(user);
+    res.json({
+      success: true,
+      user
+    });
   } catch (error) {
     console.error("Error fetching user profile:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -26,7 +30,7 @@ const getUserProfile = async (req, res) => {
 // ! FollowUnfollow User
 const followUnfollowUser = async (req, res) => {
   try {
-    console.log(`User => ${req.user}`);
+    // console.log(`User => ${req.user}`);
 
     const { id } = req.params; // User ID to follow/unfollow
     const userToModify = await User.findById(id);
@@ -43,14 +47,14 @@ const followUnfollowUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    console.log("Current User:", currentUser);
-    console.log("User to modify:", userToModify);
+    // console.log("Current User:", currentUser);
+    // console.log("User to modify:", userToModify);
 
     // Toggle follow/unfollow
     const isFollowing = currentUser.following.includes(id);
     if (isFollowing) {
       // Unfollow
-      console.log("Unfollowing user:", userToModify.userName);
+      // console.log("Unfollowing user:", userToModify.userName);
 
       currentUser.following = currentUser.following.filter(
         (userId) => userId.toString() !== id
@@ -61,12 +65,14 @@ const followUnfollowUser = async (req, res) => {
       // Save both users
       await currentUser.save();
       await userToModify.save();
-      return res.status(200).json({
+      return res.json({
+        success: true,
+        userToModify,
         message: "Unfollowed successfully",
       });
     } else {
       // Follow
-      console.log("Following user:", userToModify.userName);
+      // console.log("Following user:", userToModify.userName);
       currentUser.following.push(id);
       userToModify.followers.push(req.user._id);
 
@@ -81,7 +87,9 @@ const followUnfollowUser = async (req, res) => {
         to: userToModify._id,
       });
 
-      return res.status(200).json({
+      return res.json({
+        success: true,
+        userToModify,
         message: "Followed successfully",
       });
     }
@@ -177,7 +185,7 @@ const updateUser = async (req, res) => {
         });
       }
       user.password = await bcrypt.hash(newpassword, 10);
-      console.log("Hashing of password colpleted");
+      // console.log("Hashing of password colpleted");
     }
 
     if (profileImg) {
@@ -222,7 +230,7 @@ const updateUser = async (req, res) => {
     user.link = link || user.link;
     await user.save();
 
-    console.log("user updated successfully");
+    // console.log("user updated successfully");
 
     user.password = null; // Remove password from response
     res.json({
