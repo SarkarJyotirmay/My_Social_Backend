@@ -113,6 +113,7 @@ export const commentOnPost = async (req, res) => {
       success: true,
       message: "Comment added successfully",
       comment: newComment,
+      upadtedAt: dayjs(post.updatedAt).fromNow(),
     });
   } catch (error) {
     console.error("Error commenting on post:", error);
